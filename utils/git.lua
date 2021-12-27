@@ -1,39 +1,73 @@
-local tArgs = { ... }
+local args = { ... }
+local token_path = ".token"
 
-if #tArgs < 2 then
-    print("Usage: git <user> <repo>")
+function print_usage()
+    print("Usage: git clone <user> <repo>")
+    print("Usage: git token <token>")
+end
+
+if #args < 1 then
+    print_usage()
     return
 end
 
-local user = tArgs[1]
-local repo = tArgs[2]
+local command = args[1]
 
-local handle = fs.open(".token", "r")
-local token = handle.readLine()
+if command == "clone" then
+    local user = args[2]
+    local repo = args[3]
 
-local headers = {
-    ["User-Agent"] = "ComputerCraft 1.8",
-    ["Authorization"] = "token " .. token
-}
+    if not fs.exists(token_path) then
+        print("Add your token using: git token <token>")
+        return
+    end
 
-local handle = http.get("https://api.github.com/repos/" .. user .. "/" .. repo .. "/contents/", headers)
-local contents = textutils.unserialiseJSON(handle.readAll())
-
-if fs.exists(repo) then
-    fs.delete(repo)
-end
-
-fs.makeDir(repo)
-
-for _, entry in pairs(contents) do
-    local path = entry["path"]
-    local fh = fs.open(repo .. "/" .. path, "w")
-    local url = entry["download_url"]
-
-    local handle = http.get(url, headers)
-    local data = handle.readAll()
-
-    fh.write(data)
-
+    local fh = fs.open(".token", "r")
+    local token = fh.readLine()
     fh.close()
+
+    local headers = {
+        ["User-Agent"] = "ComputerCraft 1.8",
+        ["Authorization"] = "token " .. token
+    }
+
+    print("Cloning repo " .. user .. "/" .. repo)
+    function download(path)
+        local base_path = user .. "/" .. repo
+
+        local wh = http.get("https://api.github.com/repos/" .. base_path .. "/contents/" .. path, headers)
+        local contents = textutils.unserializeJSON(wh.readAll())
+
+        local dir = base_path .. "/" .. path
+        if fs.exists(dir) then
+            fs.delete(dir)
+        end
+
+        for _, entry in pairs(contents) do
+            local path = entry["path"]
+            local type = entry["type"]
+
+            if type == "file" then
+                local fh = fs.open(base_path .. "/" .. path, "w")
+                local handle = http.get(entry["download_url"], headers)
+                local data = handle.readAll()
+                fh.write(data)
+                fh.close()
+            elseif type == "dir" then
+                download(path)
+            end
+        end
+    end
+
+    download("")
+    print("Done cloning!")
+elseif command == "token" then
+    local token = args[1]
+
+    local fh = fs.open(token_path, "w")
+    fh.write(token)
+    fh.close()
+else
+    print_usage()
+    return
 end
