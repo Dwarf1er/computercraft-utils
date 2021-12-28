@@ -60,6 +60,9 @@ function mine_direction(direction)
         turtle.dig()
         turtle.turnLeft()
         turtle.turnLeft()
+    else
+        print("Unknown direction " .. direction)
+        return false
     end
 end
 
@@ -82,6 +85,9 @@ function move(direction)
         return turtle.up()
     elseif direction == "Down" then
         return turtle.down()
+    else
+        print("Unknown direction " .. direction)
+        return false
     end
 end
 
@@ -95,6 +101,5 @@ function mine_move(direction)
     end
 
     mine_direction(direction)
-
     return move(direction)
 end
