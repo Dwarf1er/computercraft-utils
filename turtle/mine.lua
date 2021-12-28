@@ -63,7 +63,29 @@ function mine_direction(direction)
     end
 end
 
-function mine_forward()
+function move(direction)
+    if direction == "Forward" then
+        return turtle.forward()
+    elseif direction == "Back" then
+        return turtle.back()
+    elseif direction == "Left" then
+        turtle.turnLeft()
+        local state = turtle.forward()
+        turtle.turnRight()
+        return state
+    elseif direction == "Right" then
+        turtle.turnRight()
+        local state = turtle.forward()
+        turtle.turnLeft()
+        return state
+    elseif direction == "Up" then
+        return turtle.up()
+    elseif direction == "Down" then
+        return turtle.down()
+    end
+end
+
+function mine_move(direction)
     blocks = check_blocks()
 
     for direction, data in pairs(blocks) do
@@ -72,7 +94,7 @@ function mine_forward()
         end
     end
 
-    mine_direction("Forward")
+    move(direction)
     
     return turtle.forward()
 end
