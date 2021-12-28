@@ -94,7 +94,7 @@ function mine_move(direction)
         end
     end
 
-    move(direction)
-    
-    return turtle.forward()
+    mine_direction(direction)
+
+    return move(direction)
 end
