@@ -62,7 +62,7 @@ if command == "clone" then
     download("")
     print("Done cloning!")
 elseif command == "token" then
-    local token = args[1]
+    local token = args[2]
 
     local fh = fs.open(token_path, "w")
     fh.write(token)
