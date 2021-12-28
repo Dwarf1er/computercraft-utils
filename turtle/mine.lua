@@ -1,16 +1,51 @@
 function check_blocks()
-    blocks = {
-        ["Up"] = turtle.inspectUp(),
-        ["Down"] = turtle.inspectDown(),
-        ["Forward"] = turtle.inspect()
-    }
+    blocks = {}
+
+    local success, data = turtle.inspect()
+    if success then
+        blocks["Forward"] = data
+    else
+        blocks["Forward"] = nil
+    end
+
+    local success, data = turtle.inspectUp()
+    if success then
+        blocks["Up"] = data
+    else
+        blocks["Up"] = nil
+    end
+
+    local success, data = turtle.inspectDown()
+    if success then
+        blocks["Down"] = data
+    else
+        blocks["Down"] = nil
+    end
 
     turtle.turnLeft()
-    blocks["Left"] = turtle.inspect()
+    local success, data = turtle.inspect()
+    if success then
+        blocks["Left"] = data
+    else
+        blocks["Left"] = nil
+    end
+
     turtle.turnLeft()
-    blocks["Back"] = turtle.inspect()
+    local success, data = turtle.inspect()
+    if success then
+        blocks["Back"] = data
+    else
+        blocks["Back"] = nil
+    end
+
     turtle.turnLeft()
-    blocks["Right"] = turtle.inspect()
+    local success, data = turtle.inspect()
+    if success then
+        blocks["Right"] = data
+    else
+        blocks["Right"] = nil
+    end
+
     turtle.turnLeft()
 
     return blocks
